@@ -1,0 +1,6 @@
+@KorID.API_HostAddress = http://localhost:5222
+
+GET {{KorID.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
