@@ -1,9 +1,11 @@
+using KorID.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 
 // Add services to the container.
-builder.AddNpgsqlDataSource(connectionName: "koriddb");
+builder.Services.AddDataServices(builder.Configuration, "koriddb");
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

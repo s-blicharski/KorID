@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\KorID.API\KorID.API.csproj" />
+    <ProjectReference Include="..\KorID.MigrationService\KorID.MigrationService.csproj" />
   </ItemGroup>
 
 	<Target Name="RestoreNpm" BeforeTargets="Build" Condition=" '$(DesignTimeBuild)' != 'true' ">

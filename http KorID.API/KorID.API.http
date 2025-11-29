@@ -1,0 +1,47 @@
+@KorID.API_HostAddress = http://localhost:5222
+@contentType = application/json
+
+###
+# Users - Get all
+GET {{KorID.API_HostAddress}}/api/Users
+Accept: {{contentType}}
+
+###
+# Users - Get by id
+GET {{KorID.API_HostAddress}}/api/Users/1
+Accept: {{contentType}}
+
+###
+# Users - Create
+POST {{KorID.API_HostAddress}}/api/Users
+Content-Type: {{contentType}}
+Accept: {{contentType}}
+
+{
+  "id": 0,
+  "userName": "jdoe",
+  "email": "jdoe@example.com",
+  "firstName": "John",
+  "lastName": "Doe",
+  "isActive": true
+}
+
+###
+# Users - Update
+PUT {{KorID.API_HostAddress}}/api/Users/1
+Content-Type: {{contentType}}
+Accept: {{contentType}}
+
+{
+  "id": 1,
+  "userName": "jdoe",
+  "email": "john.doe@example.com",
+  "firstName": "John",
+  "lastName": "Doe",
+  "isActive": true
+}
+
+###
+# Users - Delete
+DELETE {{KorID.API_HostAddress}}/api/Users/1
+Accept: {{contentType}}
