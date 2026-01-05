@@ -1,4 +1,4 @@
-﻿using KorID.Data.Model;
+﻿﻿using KorID.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace KorID.Data;
