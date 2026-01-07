@@ -2,7 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using KorID.API.Models;
-using KorID.Data.Entities;
+using KorID.Data.Model;
 using KorID.Data.Repositories;
 using Microsoft.IdentityModel.Tokens;
 

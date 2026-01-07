@@ -1,4 +1,4 @@
-﻿using KorID.Data.Entities;
+﻿using KorID.Data.Model;
 
 namespace KorID.Data.Repositories;
 

@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using KorID.API.Models;
-using KorID.Data.Entities;
+using KorID.Data.Model;
 using KorID.Data.Repositories;
 using Microsoft.AspNetCore.Mvc;
 

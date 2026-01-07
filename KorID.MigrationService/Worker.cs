@@ -1,5 +1,5 @@
 using KorID.Data;
-using KorID.Data.Entities;
+using KorID.Data.Model;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 
