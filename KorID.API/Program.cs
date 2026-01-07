@@ -43,6 +43,13 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+// Konfiguracja CORS (pozwalamy na dostęp z frontendu)
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy => 
+        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+});
+
 // Rejestracja serwisu hashowania haseł
 builder.Services.AddSingleton<IPasswordHasher, BCryptPasswordHasher>();
 
@@ -57,6 +64,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("AllowAll");
 
 app.UseAuthentication();
 app.UseAuthorization();
