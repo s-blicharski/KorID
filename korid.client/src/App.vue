@@ -1,21 +1,20 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
+import UserList from './components/admin/UserList.vue'
+import OrganizationList from './components/admin/OrganizationList.vue'
 
-console.log("Home Page - Work")
+console.log("Admin UI Mockup")
 </script>
 
 <template>
   <header>
     <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-    </div>
+    <h1>Panel Administratora (Makieta)</h1>
   </header>
 
   <main>
-    <TheWelcome />
+    <UserList />
+    <hr />
+    <OrganizationList />
   </main>
 </template>
 
@@ -38,12 +37,6 @@ header {
 
   .logo {
     margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
   }
 }
 </style>
