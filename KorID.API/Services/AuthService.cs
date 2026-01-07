@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using KorID.API.Models;
+using KorID.Data.Entities;
 using KorID.Data.Repositories;
 using Microsoft.IdentityModel.Tokens;
 
@@ -11,11 +12,13 @@ public class AuthService : IAuthService
 {
     private readonly IUserRepository _userRepository;
     private readonly IConfiguration _configuration;
+    private readonly IPasswordHasher _passwordHasher;
 
-    public AuthService(IUserRepository userRepository, IConfiguration configuration)
+    public AuthService(IUserRepository userRepository, IConfiguration configuration, IPasswordHasher passwordHasher)
     {
         _userRepository = userRepository;
         _configuration = configuration;
+        _passwordHasher = passwordHasher;
     }
 
     public async Task<LoginResponse?> AuthenticateAsync(string username, string password)
@@ -39,14 +42,32 @@ public class AuthService : IAuthService
         };
     }
 
+    public async Task<bool> RegisterAsync(RegisterRequest request)
+    {
+        if (await _userRepository.GetByUsernameAsync(request.Username) != null)
+        {
+            return false;
+        }
+
+        var user = new User
+        {
+            Username = request.Username,
+            Email = request.Email,
+            PasswordHash = HashPassword(request.Password)
+        };
+
+        await _userRepository.AddAsync(user);
+        return true;
+    }
+
     public string HashPassword(string password)
     {
-        return BCrypt.Net.BCrypt.HashPassword(password);
+        return _passwordHasher.Hash(password);
     }
 
     public bool VerifyPassword(string password, string passwordHash)
     {
-        return BCrypt.Net.BCrypt.Verify(password, passwordHash);
+        return _passwordHasher.Verify(password, passwordHash);
     }
 
     private string GenerateJwtToken(int userId, string username, string email)

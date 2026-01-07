@@ -21,7 +21,7 @@ namespace KorID.Data.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("KorID.Data.Model.User", b =>
+            modelBuilder.Entity("KorID.Data.Entities.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()

@@ -37,4 +37,26 @@ public class AuthController : ControllerBase
 
         return Ok(response);
     }
+
+    /// <summary>
+    /// Register endpoint - creates a new user
+    /// </summary>
+    /// <param name="request">Registration details</param>
+    /// <returns>Success message if registered</returns>
+    [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var result = await _authService.RegisterAsync(request);
+        if (!result)
+        {
+            return BadRequest(new { message = "Username already exists" });
+        }
+
+        return Ok(new { message = "User registered successfully" });
+    }
 }

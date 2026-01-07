@@ -11,8 +11,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace KorID.Data.Migrations
 {
     [DbContext(typeof(KorIdDbContext))]
-    [Migration("20260104173533_AddUserAuth")]
-    partial class AddUserAuth
+    [Migration("20260105132701_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

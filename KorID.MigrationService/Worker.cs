@@ -1,5 +1,5 @@
 using KorID.Data;
-using KorID.Data.Model;
+using KorID.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 
@@ -48,6 +48,7 @@ public class Worker(
         {
             Username = "admin",
             Email = "ad@gmail.com",
+            PasswordHash = "change_me_later" // Wymagane pole dla encji User
         };
 
         var strategy = dbContext.Database.CreateExecutionStrategy();

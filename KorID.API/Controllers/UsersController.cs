@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using KorID.Data.Model;
+using KorID.Data.Entities;
 using KorID.Data.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
@@ -72,8 +72,8 @@ namespace KorID.API.Controllers
         [HttpPost]
         public async Task<ActionResult<User>> PostUser(User user)
         {
-            var created = await _repo.AddAsync(user);
-            return CreatedAtAction(nameof(GetUser), new { id = created.Id }, created);
+            await _repo.AddAsync(user);
+            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
         }
 
         // DELETE: api/Users/5

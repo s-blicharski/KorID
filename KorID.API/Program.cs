@@ -43,6 +43,9 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+// Rejestracja serwisu hashowania haseł
+builder.Services.AddSingleton<IPasswordHasher, BCryptPasswordHasher>();
+
 var app = builder.Build();
 
 app.MapDefaultEndpoints();
