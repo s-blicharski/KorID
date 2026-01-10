@@ -37,183 +37,220 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
+  import { ref, computed } from 'vue';
+  import { useRouter, useRoute } from 'vue-router';
 
-const router = useRouter();
-const route = useRoute();
+  const router = useRouter();
+  const route = useRoute();
 
-const email = ref('');
-const password = ref('');
-const error = ref('');
-const submitting = ref(false);
+  const email = ref('');
+  const password = ref('');
+  const error = ref('');
+  const submitting = ref(false);
 
-const emailTouched = ref(false);
-const passwordTouched = ref(false);
+  const emailTouched = ref(false);
+  const passwordTouched = ref(false);
 
-// Read application id and optional redirectUrl from query params or route params
-const applicationId = ref(route.query.applicationId || route.query.appId || route.params.applicationId || route.params.appId || '');
-const redirectUrl = ref(route.query.redirectUrl || route.query.redirect || '');
+  // Read application id and optional redirectUrl from query params or route params
+  const applicationId = ref(route.query.applicationId || route.query.appId || route.params.applicationId || route.params.appId || '');
+  const redirectUrl = ref(route.query.redirectUrl || route.query.redirect || '');
 
-// API base (try Vite env then fallback to localhost backend port)
-const API_BASE = import.meta.env.VITE_API_URL || 'https://localhost:7162';
+  // API base (try Vite env then fallback to localhost backend port)
+  const API_BASE = import.meta.env.VITE_API_URL || 'https://localhost:7162';
 
-const emailValid = computed(() => {
-  const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\\.,;:\s@\"]+\.)+[^<>()[\]\\.,;:\s@\"]{2,})$/i;
-  return re.test(email.value);
-});
+  const emailValid = computed(() => {
+    const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\\.,;:\s@\"]+\.)+[^<>()[\]\\.,;:\s@\"]{2,})$/i;
+    return re.test(email.value);
+  });
 
-const passwordValid = computed(() => password.value.length >= 6);
-const formValid = computed(() => emailValid.value && passwordValid.value);
+  const passwordValid = computed(() => password.value.length >= 6);
+  const formValid = computed(() => emailValid.value && passwordValid.value);
 
-async function onSubmit() {
-  error.value = '';
-  emailTouched.value = true;
-  passwordTouched.value = true;
+  async function onSubmit() {
+    error.value = '';
+    emailTouched.value = true;
+    passwordTouched.value = true;
 
-  if (!applicationId.value) {
-    error.value = 'Brak Application ID. Nie można kontynuować.';
-    return;
-  }
-
-  if (!formValid.value) return;
-
-  submitting.value = true;
-
-  try {
-    // Call backend endpoint to validate user + permissions for given application
-    // Expected request body: { email, password, applicationId, redirectUrl? }
-
-    const payload = { email: email.value, password: password.value, applicationId: applicationId.value };
-    if (redirectUrl.value) payload['redirectUrl'] = redirectUrl.value;
-
-    const res = await fetch(`${API_BASE}/api/external/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-
-    if (!res.ok) {
-      // Try to read message from body
-      let bodyText = '';
-      try { const json = await res.json(); bodyText = json?.message || JSON.stringify(json); } catch { bodyText = await res.text(); }
-      error.value = `Błąd serwera: ${res.status} ${bodyText}`;
+    if (!applicationId.value) {
+      error.value = 'Brak Application ID. Nie można kontynuować.';
       return;
     }
 
-    const data = await res.json();
-    if (data?.success) {
-      // if backend provides redirectUrl, redirect back to calling application with username and status
-      const target = data.redirectUrl || redirectUrl.value;
-      if (target) {
-        const params = new URLSearchParams();
-        if (data.username) params.set('username', data.username);
-        params.set('status', 'ok');
-        const sep = target.includes('?') ? '&' : '?';
-        window.location.href = target + sep + params.toString();
+    if (!formValid.value) return;
+
+    submitting.value = true;
+
+    try {
+      // Call backend endpoint to validate user + permissions for given application
+      // Expected request body: { email, password, applicationId, redirectUrl? }
+
+      const payload = { email: email.value, password: password.value, applicationId: applicationId.value };
+      if (redirectUrl.value) payload['redirectUrl'] = redirectUrl.value;
+
+      const res = await fetch(`${API_BASE}/api/external/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) {
+        // Read body (could be ProblemDetails, custom message or plain text)
+        let parsedBody = null;
+        try { parsedBody = await res.json(); } catch { parsedBody = await res.text().catch(() => null); }
+
+        // Provide a clear message for 403 (forbidden -> user lacks grant for this application)
+        if (res.status === 403) {
+          // server may return { title, detail } or { message }
+          error.value = parsedBody?.message || parsedBody?.detail || parsedBody?.title || 'Brak uprawnień do tej aplikacji. Skontaktuj się z administratorem.';
+          console.warn('External login forbidden:', parsedBody);
+          return;
+        }
+
+        if (res.status === 401) {
+          error.value = parsedBody?.message || 'Nieprawidłowe dane logowania.';
+          console.warn('External login unauthorized:', parsedBody);
+          return;
+        }
+
+        if (res.status === 400) {
+          // validation errors - try to surface them
+          if (parsedBody && typeof parsedBody === 'object') {
+            // ASP.NET ProblemDetails or model state may include "errors" dictionary
+            const errs = parsedBody.errors || parsedBody;
+            if (errs && typeof errs === 'object') {
+              const flat = Object.values(errs).flat?.() ?? Object.values(errs).join(' ');
+              error.value = String(flat) || 'Błąd walidacji danych.';
+            } else {
+              error.value = JSON.stringify(parsedBody);
+            }
+          } else {
+            error.value = String(parsedBody) || 'Błąd walidacji (400).';
+          }
+          console.warn('External login bad request:', parsedBody);
+          return;
+        }
+
+        // fallback for other statuses
+        const bodyText = typeof parsedBody === 'string' ? parsedBody : JSON.stringify(parsedBody);
+        error.value = `Błąd serwera: ${res.status} ${bodyText ?? ''}`;
+        console.error('External login failed', res.status, parsedBody);
         return;
       }
 
-      // Fallback: navigate to provided route inside SPA if backend returned route
-      if (data.redirectRoute) {
-        router.push(data.redirectRoute);
-        return;
-      }
+      const data = await res.json();
+      if (data?.success) {
+        // if backend provides redirectUrl, redirect back to calling application with username and status
+        const target = data.redirectUrl || redirectUrl.value;
+        if (target) {
+          const params = new URLSearchParams();
+          if (data.username) params.set('username', data.username);
+          params.set('status', 'ok');
+          const sep = target.includes('?') ? '&' : '?';
+          window.location.href = target + sep + params.toString();
+          return;
+        }
 
-      // If no redirect provided, show success message
-      error.value = 'Zalogowano, ale brak adresu przekierowania.';
-    } else {
-      error.value = data?.message || 'Nieprawidłowe dane logowania lub brak uprawnień.';
+        // Fallback: navigate to provided route inside SPA if backend returned route
+        if (data.redirectRoute) {
+          router.push(data.redirectRoute);
+          return;
+        }
+
+        // If no redirect provided, show success message
+        error.value = 'Zalogowano, ale brak adresu przekierowania.';
+      } else {
+        error.value = data?.message || 'Nieprawidłowe dane logowania lub brak uprawnień.';
+      }
+    } catch (e) {
+      console.error('External login error', e);
+      error.value = 'Błąd połączenia. Spróbuj ponownie.';
+    } finally {
+      submitting.value = false;
     }
-  } catch (e) {
-    error.value = 'Błąd połączenia. Spróbuj ponownie.';
-  } finally {
-    submitting.value = false;
   }
-}
 </script>
 
 <style scoped>
-.login-wrapper {
-  background-color: inherit;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 0;
-}
+  .login-wrapper {
+    background-color: inherit;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+  }
 
-.login-card {
-  background: white;
-  padding: 32px;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  width: 360px;
-  text-align: left;
-}
+  .login-card {
+    background: white;
+    padding: 32px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    width: 360px;
+    text-align: left;
+  }
 
-.login-card h1 {
-  color: #2c3e50;
-  margin: 0 0 8px 0;
-}
+    .login-card h1 {
+      color: #2c3e50;
+      margin: 0 0 8px 0;
+    }
 
-.subtitle {
-  color: #606266;
-  margin: 0 0 12px 0;
-}
+  .subtitle {
+    color: #606266;
+    margin: 0 0 12px 0;
+  }
 
-.app-info {
-  margin-bottom: 12px;
-  font-size: 13px;
-}
+  .app-info {
+    margin-bottom: 12px;
+    font-size: 13px;
+  }
 
-.field {
-  margin-bottom: 16px;
-}
+  .field {
+    margin-bottom: 16px;
+  }
 
-.field label {
-  display: block;
-  font-size: 14px;
-  margin-bottom: 6px;
-  color: #333;
-}
+    .field label {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 6px;
+      color: #333;
+    }
 
-.field input {
-  width: 100%;
-  padding: 8px 10px;
-  border: 1px solid #dcdfe6;
-  border-radius: 4px;
-  box-sizing: border-box;
-}
+    .field input {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #dcdfe6;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
 
-.error {
-  color: #e74c3c;
-  font-size: 12px;
-  margin-top: 6px;
-}
+  .error {
+    color: #e74c3c;
+    font-size: 12px;
+    margin-top: 6px;
+  }
 
-.actions {
-  display: flex;
-  justify-content: center;
-}
+  .actions {
+    display: flex;
+    justify-content: center;
+  }
 
-button.primary {
-  background-color: #42b983;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
-  cursor: pointer;
-}
+  button.primary {
+    background-color: #42b983;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
 
-button.primary[disabled] {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
+    button.primary[disabled] {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
 
-.server-error {
-  color: #e74c3c;
-  margin-top: 12px;
-  text-align: center;
-}
+  .server-error {
+    color: #e74c3c;
+    margin-top: 12px;
+    text-align: center;
+  }
 </style>

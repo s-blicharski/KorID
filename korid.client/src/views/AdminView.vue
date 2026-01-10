@@ -3,6 +3,7 @@
   import { useRouter } from 'vue-router';
   import OrganizationList from "../components/admin/OrganizationList.vue";
   import UserList from "../components/admin/UserList.vue";
+  import AplicationsList from "../components/admin/AplicationsList.vue";
 
   const router = useRouter();
   const username = ref<string | null>(null);
@@ -49,7 +50,7 @@
   }
 
   function handleUnauthorized() {
-    // token expired / invalid � force logout
+    // token expired / invalid — force logout
     logout();
   }
 
@@ -84,14 +85,15 @@
       <aside style="width: 220px; background-color: #2c3e50; color: white; padding: 20px;">
         <h3 style="margin-top:0;">Menu boczne</h3>
         <p>Dashboard</p>
-        <p>U�ytkownicy</p>
+        <p>Użytkownicy</p>
       </aside>
 
       <main style="flex: 1; padding: 20px; overflow:auto;">
         <h1>Panel Administratora</h1>
-        <p>Widzisz to, bo jeste� na �cie�ce /admin.</p>
+        <p>Widzisz to, bo jesteś na ścieżce /admin.</p>
         <OrganizationList />
         <UserList />
+        <AplicationsList />
       </main>
     </div>
   </div>
