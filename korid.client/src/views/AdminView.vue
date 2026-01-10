@@ -4,7 +4,6 @@
   import OrganizationList from "../components/admin/OrganizationList.vue";
   import UserList from "../components/admin/UserList.vue";
   import AplicationsList from "../components/admin/AplicationsList.vue";
-
   const router = useRouter();
   const username = ref<string | null>(null);
 
@@ -29,7 +28,7 @@
     if (!token) return null;
     const parts = token.split('.');
     if (parts.length < 2) return null;
-    const payloadJson = base64UrlDecode(parts[1]);
+    const payloadJson = base64UrlDecode(parts[1]!);
     if (!payloadJson) return null;
     try {
       const payload = JSON.parse(payloadJson) as Record<string, unknown>;
@@ -50,7 +49,6 @@
   }
 
   function handleUnauthorized() {
-    // token expired / invalid — force logout
     logout();
   }
 
@@ -65,35 +63,27 @@
 </script>
 
 <template>
-  <div style="display:flex; flex-direction:column; height:100vh;">
-    <!-- Top navbar -->
-    <header style="display:flex; align-items:center; justify-content:space-between; padding:12px 20px; background:#1f2937; color:white;">
-      <div style="display:flex; align-items:center; gap:12px;">
-        <h2 style="margin:0; font-size:18px;">KorID Admin</h2>
-        <span style="opacity:0.8;">/ Panel Administratora</span>
-      </div>
+  <div class="min-h-screen flex flex-col">
+    <div class="flex flex-1 overflow-hidden">
+      <main class="flex-1 p-6 overflow-auto ">
+        <div class="flex items-cente justify-end mb-6">
+          <div class="flex items-center  gap-3">
+            <span v-if="username" class="font-semibold text-2xl"><i>Nazwa użytkownika: </i>{{ username }}</span>
+            <button
+              @click="logout"
+              class="bg-red-500 hover:bg-red-600 text-white text-xl p-3 rounded-md transition"
+            >
+              Wyloguj się
+            </button>
+          </div>
+        </div>
 
-      <div style="display:flex; align-items:center; gap:12px;">
-        <span v-if="username" style="font-weight:600;">{{ username }}</span>
-        <button @click="logout" style="background:#ef4444; color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer;">
-          Logout
-        </button>
-      </div>
-    </header>
-
-    <div style="display: flex; flex:1; overflow:hidden;">
-      <aside style="width: 220px; background-color: #2c3e50; color: white; padding: 20px;">
-        <h3 style="margin-top:0;">Menu boczne</h3>
-        <p>Dashboard</p>
-        <p>Użytkownicy</p>
-      </aside>
-
-      <main style="flex: 1; padding: 20px; overflow:auto;">
-        <h1>Panel Administratora</h1>
-        <p>Widzisz to, bo jesteś na ścieżce /admin.</p>
-        <OrganizationList />
-        <UserList />
-        <AplicationsList />
+        <h1 class="text-2xl font-semibold mb-2">Panel Administratora</h1>
+        <div class="space-y-6">
+          <OrganizationList />
+          <UserList />
+          <AplicationsList />
+        </div>
       </main>
     </div>
   </div>

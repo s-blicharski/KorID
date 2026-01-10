@@ -92,9 +92,9 @@ const editUser = (id: number) => {
 <template>
   <div class="admin-panel">
     <h2>Lista Użytkowników</h2>
-    
+
     <div v-if="loading">Ładowanie danych...</div>
-    
+
     <table v-else class="data-table">
       <thead>
         <tr>
@@ -120,21 +120,43 @@ const editUser = (id: number) => {
     </table>
 
     <!-- Prosty Modal Edycji -->
-    <div v-if="editingUser" class="modal-overlay">
-      <div class="modal">
-        <h3>Edycja użytkownika</h3>
-        <form @submit.prevent="saveUser">
-          <div class="form-group">
-            <label>Nazwa użytkownika:</label>
-            <input v-model="editForm.username" required />
+    <div v-if="editingUser" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+      <div class="bg-white w-full max-w-md rounded-lg shadow-xl p-6 mx-4">
+        <h3 class="text-lg font-semibold mb-4">Edycja użytkownika</h3>
+        <form @submit.prevent="saveUser" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Nazwa użytkownika</label>
+            <input
+              v-model="editForm.username"
+              required
+              class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
           </div>
-          <div class="form-group">
-            <label>Email:</label>
-            <input v-model="editForm.email" type="email" required />
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <input
+              v-model="editForm.email"
+              type="email"
+              required
+              class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
           </div>
-          <div class="actions">
-            <button type="button" @click="editingUser = null">Anuluj</button>
-            <button type="submit">Zapisz</button>
+
+          <div class="flex justify-end gap-3 mt-2">
+            <button
+              type="button"
+              @click="editingUser = null"
+              class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition"
+            >
+              Anuluj
+            </button>
+            <button
+              type="submit"
+              class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition"
+            >
+              Zapisz
+            </button>
           </div>
         </form>
       </div>
