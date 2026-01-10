@@ -62,176 +62,58 @@ async function handleLogin() {
 </script>
 
 <template>
-  <div class="login-container">
-    <div class="login-card">
-      <h2>Admin Login</h2>
-
-      <form @submit.prevent="handleLogin">
-        <div class="form-group">
-          <label for="username">Username</label>
-          <input
-            id="username"
-            v-model="username"
-            type="text"
-            placeholder="Enter admin username"
-            :disabled="loading"
-            autocomplete="username"
-          />
+  <div class="flex items-center justify-center p-6 min-h-screen">
+      <div class="hero-content flex-col lg:flex-row-reverse w-full  max-w-4xl min-h-128 mx-auto bg-gray-400/50 rounded-2xl shadow-xl">
+        <div class="text-center lg:text-left lg:w-1/2 px-4">
+          <h1 class="text-5xl font-bold">Login now!</h1>
+          <p class="py-6">
+            Zaloguj się do panelu administratora.
+          </p>
         </div>
 
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input
-            id="password"
-            v-model="password"
-            type="password"
-            placeholder="Enter password"
-            :disabled="loading"
-            autocomplete="current-password"
-          />
+        <div class="card bg-base-100 w-full max-w-sm shrink-0 shadow-2xl lg:w-1/2 px-4">
+          <div class="card-body">
+            <form @submit.prevent="handleLogin" class="w-full">
+              <fieldset class="fieldset">
+                <label class="label">Email</label>
+                <input
+                  id="username"
+                  v-model="username"
+                  type="text"
+                  class="input"
+                  placeholder="Email"
+                  :disabled="loading"
+                  autocomplete="username"
+                />
+
+                <label class="label mt-3">Password</label>
+                <input
+                  id="password"
+                  v-model="password"
+                  type="password"
+                  class="input"
+                  placeholder="Password"
+                  :disabled="loading"
+                  autocomplete="current-password"
+                />
+                <div v-if="error" class="text-sm text-red-600 mb-2">
+                  {{ error }}
+                </div>
+
+                <button
+                  type="submit"
+                  class="btn btn-neutral mt-4 w-full inline-flex items-center justify-center"
+                  :disabled="loading"
+                >
+                  <span v-if="loading" class="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" aria-hidden="true"></span>
+                  <span v-if="!loading">Login</span>
+                  <span v-else>Processing...</span>
+                </button>
+              </fieldset>
+            </form>
+          </div>
         </div>
 
-        <div v-if="error" class="error-alert">
-          {{ error }}
-        </div>
-
-        <button type="submit" :disabled="loading" class="login-btn">
-          <span v-if="loading" class="spinner"></span>
-          <span v-else>Sign In</span>
-        </button>
-      </form>
+      </div>
     </div>
-  </div>
 </template>
-
-<style scoped>
-
-*{box-sizing:border-box}
-.login-container{
-  min-height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:32px;
-}
-
-/* karta logowania */
-.login-card{
-  width:100%;
-  max-width:420px;
-  background:linear-gradient(180deg, rgba(255,255,255,0.9), var(--card));
-  border-radius:var(--radius);
-  box-shadow:var(--shadow);
-  padding:28px;
-  border:1px solid rgba(15,23,42,0.04);
-  backdrop-filter: blur(6px);
-}
-
-/* nagłówek */
-.login-card h2{
-  margin:0 0 18px 0;
-  font-size:20px;
-  font-weight:600;
-  color:white;
-}
-
-/* formularz */
-.form-group{
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-  margin-bottom:14px;
-}
-
-.form-group label{
-  font-size:13px;
-  margin: 12px;
-  user-select:none;
-}
-
-.form-group input{
-  height:44px;
-  padding:10px 12px;
-  font-size:15px;
-  border-radius:8px;
-  border:1px solid rgba(15,23,42,0.07);
-  background:linear-gradient(180deg, #fff, #fbfdff);
-  color:#0f172a;
-  outline:none;
-  transition:box-shadow .14s ease, border-color .14s ease, transform .06s ease;
-}
-
-.form-group input::placeholder{color:#9ca3af}
-.form-group input:focus{
-  box-shadow:0 6px 18px rgba(43,108,176,0.12);
-  border-color:var(--accent);
-  transform:translateY(-1px);
-}
-
-/* komunikat błędu */
-.error-alert{
-  background: rgba(229,62,62,0.08);
-  color:var(--danger);
-  padding:10px 12px;
-  border-radius:8px;
-  margin-bottom:12px;
-  font-size:14px;
-  border:1px solid rgba(229,62,62,0.12);
-}
-
-/* przycisk logowania */
-.login-btn{
-  width:100%;
-  height:46px;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:10px;
-  padding:0 16px;
-  background:var(--accent);
-  color:#fff;
-  font-weight:600;
-  border:none;
-  border-radius:10px;
-  cursor:pointer;
-  transition:transform .12s ease, box-shadow .12s ease, background .12s ease;
-  box-shadow:0 6px 18px rgba(43,108,176,0.12);
-}
-
-.login-btn:hover{ background:var(--accent-600); transform:translateY(-2px) }
-.login-btn:active{ transform:translateY(0) }
-.login-btn:disabled{
-  opacity:0.66;
-  cursor:not-allowed;
-  transform:none;
-  box-shadow:none;
-  background:linear-gradient(90deg, #9fb7db, #8bb0db);
-}
-
-/* spinner */
-.spinner{
-  width:18px;
-  height:18px;
-  border-radius:50%;
-  border:2px solid rgba(255,255,255,0.22);
-  border-top-color:rgba(255,255,255,0.92);
-  animation:spin 0.9s linear infinite;
-}
-@keyframes spin{ to { transform:rotate(360deg) } }
-
-/* responsywność */
-@media (max-width:480px){
-  .login-card{
-    padding:20px;
-    border-radius:10px;
-  }
-  .login-card h2{ font-size:18px }
-  .form-group input{ height:42px }
-  .login-btn{ height:44px }
-}
-
-/* accessibility: reduced motion */
-@media (prefers-reduced-motion: reduce){
-  .login-card, .form-group input, .login-btn, .login-btn:hover{ transition:none; animation:none }
-}
-</style>

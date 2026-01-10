@@ -186,7 +186,7 @@
   }
 
   async function deleteApp(app: Application) {
-    if (!confirm('Czy na pewno usun�� aplikacj�?')) return
+    if (!confirm('Czy na pewno usunąć aplikację?')) return
     const id = normalizeAppId(app)
     try {
       const res = await fetch(`${API_BASE}/api/applications/${id}`, { method: 'DELETE' })
@@ -262,10 +262,10 @@
     <h2>Lista Aplikacji</h2>
 
     <div style="margin-bottom:0.5rem;">
-      <button @click="openCreate">Dodaj aplikacj�</button>
+      <button @click="openCreate">Dodaj aplikacje</button>
     </div>
 
-    <div v-if="loading">�adowanie aplikacji...</div>
+    <div v-if="loading">Ładowanie aplikacji...</div>
 
     <table v-else class="data-table">
       <thead>
@@ -287,8 +287,8 @@
           <td>{{ app.redirectUri ?? app.RedirectUri }}</td>
           <td>
             <button @click="openEdit(app)">Edytuj</button>
-            <button class="danger" @click="deleteApp(app)">Usu�</button>
-            <button @click="openManageUsers(app)">Zarz�dzaj u�ytkownikami</button>
+            <button class="danger" @click="deleteApp(app)">Usuń</button>
+            <button @click="openManageUsers(app)">Zarządzaj użytkownikami</button>
           </td>
         </tr>
       </tbody>
@@ -297,7 +297,7 @@
     <!-- Create Modal -->
     <div v-if="creating" class="modal-overlay">
       <div class="modal">
-        <h3>Dodaj aplikacj�</h3>
+        <h3>Dodaj aplikację</h3>
         <form @submit.prevent="saveCreate">
           <div class="form-group">
             <label>Nazwa</label>
@@ -328,75 +328,91 @@
     </div>
 
     <!-- Edit Modal -->
-    <div v-if="editingApp" class="modal-overlay">
-      <div class="modal">
-        <h3>Edytuj aplikacj�</h3>
-        <form @submit.prevent="saveEdit">
-          <div class="form-group">
-            <label>Nazwa</label>
-            <input v-model="form.name" required />
+    <div v-if="editingApp" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+      <div class="bg-white w-full max-w-xl rounded-lg shadow-xl p-6 mx-auto">
+        <h3 class="text-lg font-semibold mb-4">Edytuj aplikację</h3>
+        <form @submit.prevent="saveEdit" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Nazwa</label>
+            <input v-model="form.name" required
+                   class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
           </div>
-          <div class="form-group">
-            <label>ClientId</label>
-            <input v-model="form.clientId" required />
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">ClientId</label>
+            <input v-model="form.clientId" required
+                   class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
           </div>
-          <div class="form-group">
-            <label>ClientSecret</label>
-            <input v-model="form.clientSecret" />
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">ClientSecret</label>
+            <input v-model="form.clientSecret"
+                   class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
           </div>
-          <div class="form-group">
-            <label>Redirect URI</label>
-            <input v-model="form.redirectUri" />
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Redirect URI</label>
+            <input v-model="form.redirectUri"
+                   class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
           </div>
-          <div class="form-group">
-            <label>OrganizationId</label>
-            <input v-model="form.organizationId" type="number" />
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">OrganizationId</label>
+            <input v-model="form.organizationId" type="number"
+                   class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
           </div>
-          <div class="actions">
-            <button type="button" @click="editingApp = null">Anuluj</button>
-            <button type="submit">Zapisz</button>
+
+          <div class="flex justify-end gap-3 mt-4">
+            <button type="button" @click="editingApp = null"
+                    class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition">Anuluj</button>
+            <button type="submit"
+                    class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">Zapisz</button>
           </div>
         </form>
       </div>
     </div>
 
     <!-- Manage Users Modal -->
-    <div v-if="managingApp" class="modal-overlay">
-      <div class="modal" style="width:700px; max-height:80vh; overflow:auto;">
-        <h3>Zarz�dzaj u�ytkownikami dla: {{ getAppName(managingApp) }}</h3>
-        <p>Lista wszystkich u�ytkownik�w. Zaznacz aby nada� dost�p do tej aplikacji.</p>
+    <div v-if="managingApp" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+      <div class="bg-white w-full max-w-4xl rounded-lg shadow-xl p-6 mx-auto max-h-[80vh] overflow-auto">
+        <h3 class="text-lg text-gray-600 font-semibold mb-2">Zarządzaj użytkownikami dla: {{ getAppName(managingApp) }}</h3>
+        <p class="text-sm text-gray-600 mb-4">Lista wszystkich użytkowników. Zaznacz aby nadać dostęp do tej aplikacji.</p>
 
-        <table class="data-table" style="margin-top:1rem;">
-          <thead>
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
             <tr>
-              <th>ID</th>
-              <th>Nazwa</th>
-              <th>Email</th>
-              <th>Ma dost�p</th>
-              <th>Akcja</th>
+              <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+              <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nazwa</th>
+              <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+              <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ma dostęp</th>
+              <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Akcja</th>
             </tr>
-          </thead>
-          <tbody>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
             <tr v-for="u in users" :key="normalizeUserId(u)">
-              <td>{{ normalizeUserId(u) }}</td>
-              <td>{{ u.username ?? u.Username }}</td>
-              <td>{{ u.email ?? u.Email }}</td>
-              <td>
+              <td class="px-3 py-2 text-sm text-gray-700">{{ normalizeUserId(u) }}</td>
+              <td class="px-3 py-2 text-sm text-gray-700">{{ u.username ?? u.Username }}</td>
+              <td class="px-3 py-2 text-sm text-gray-700">{{ u.email ?? u.Email }}</td>
+              <td class="px-3 py-2">
                 <input type="checkbox"
                        :checked="managingChecked[`${normalizeUserId(u)}:${normalizeAppId(managingApp)}`]"
-                       @change="toggleUserForApp(u, managingApp)" />
+                       @change="toggleUserForApp(u, managingApp)"
+                       class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500" />
               </td>
-              <td>
-                <button @click="toggleUserForApp(u, managingApp)">
-                  {{ managingChecked[`${normalizeUserId(u)}:${normalizeAppId(managingApp)}`] ? 'Cofnij dost�p' : 'Nadaj dost�p' }}
+              <td class="px-3 py-2">
+                <button @click="toggleUserForApp(u, managingApp)"
+                        class="px-3 py-1 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition text-sm">
+                  {{ managingChecked[`${normalizeUserId(u)}:${normalizeAppId(managingApp)}`] ? 'Cofnij dostęp' : 'Nadaj dostęp' }}
                 </button>
               </td>
             </tr>
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+        </div>
 
-        <div class="actions" style="margin-top:1rem;">
-          <button @click="closeManageUsers">Zamknij</button>
+        <div class="flex justify-end mt-4">
+          <button @click="closeManageUsers" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition">Zamknij</button>
         </div>
       </div>
     </div>
@@ -462,4 +478,4 @@
     gap: 1rem;
     margin-top: 1rem;
   }
-</style>        
+</style>
