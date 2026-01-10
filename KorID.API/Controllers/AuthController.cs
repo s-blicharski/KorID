@@ -37,6 +37,23 @@ public class AuthController : ControllerBase
 
         return Ok(response);
     }
+    [HttpPost("admin/login")]
+    public async Task<ActionResult<LoginResponse>> AdminLogin([FromBody] LoginRequest request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var response = await _authService.AuthenticateAsync(request.Username, request.Password);
+
+        if (response == null)
+        {
+            return Unauthorized(new { message = "Invalid username or password" });
+        }
+
+        return Ok(response);
+    }
 
     /// <summary>
     /// Register endpoint - creates a new user
