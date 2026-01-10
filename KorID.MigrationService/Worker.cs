@@ -86,7 +86,7 @@ public class Worker(
                     Name = "Demo App",
                     ClientId = "demo-client-id",
                     ClientSecret = "demo-client-secret",
-                    RedirectUri = "http://localhost:5173/test/callback",
+                    RedirectUri = "https://google.pl",
                     OrganizationId = demoOrg.Id
                 };
                 await dbContext.Applications.AddAsync(demoApp, cancellationToken);
