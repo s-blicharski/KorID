@@ -67,6 +67,14 @@ public class AuthService : IAuthService
 
     public bool VerifyPassword(string password, string passwordHash)
     {
+        // Support a demo plaintext marker used by migration seeding to simplify local testing.
+        // If a stored hash starts with "$DEMO$HASH$", the remainder is treated as plaintext password.
+        if (!string.IsNullOrEmpty(passwordHash) && passwordHash.StartsWith("$DEMO$HASH$"))
+        {
+            var demoPlain = passwordHash.Substring("$DEMO$HASH$".Length);
+            return password == demoPlain;
+        }
+
         return _passwordHasher.Verify(password, passwordHash);
     }
 
