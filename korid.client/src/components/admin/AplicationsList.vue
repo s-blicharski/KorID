@@ -259,10 +259,10 @@
 
 <template>
   <div class="admin-panel">
-    <h2>Lista Aplikacji</h2>
+    <h2 class="text-2xl mb-2">Lista Aplikacji</h2>
 
-    <div style="margin-bottom:0.5rem;">
-      <button @click="openCreate">Dodaj aplikacje</button>
+    <div class="m-2">
+      <button @click="openCreate" class="btn btn-dash mt-4">Dodaj aplikacje</button>
     </div>
 
     <div v-if="loading">Ładowanie aplikacji...</div>
@@ -286,42 +286,55 @@
           <td>{{ getOrgName(app) }}</td>
           <td>{{ app.redirectUri ?? app.RedirectUri }}</td>
           <td>
-            <button @click="openEdit(app)">Edytuj</button>
-            <button class="danger" @click="deleteApp(app)">Usuń</button>
-            <button @click="openManageUsers(app)">Zarządzaj użytkownikami</button>
+            <button @click="openEdit(app)" class="btn">Edytuj</button>
+            <button class="danger btn" @click="deleteApp(app)">Usuń</button>
+            <button @click="openManageUsers(app)" class="btn">Zarządzaj użytkownikami</button>
           </td>
         </tr>
       </tbody>
     </table>
 
     <!-- Create Modal -->
-    <div v-if="creating" class="modal-overlay">
-      <div class="modal">
-        <h3>Dodaj aplikację</h3>
-        <form @submit.prevent="saveCreate">
-          <div class="form-group">
-            <label>Nazwa</label>
-            <input v-model="form.name" required />
+    <div v-if="creating" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+      <div role="dialog" aria-modal="true" class="bg-white w-full max-w-md rounded-lg shadow-xl p-6">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">Dodaj aplikację</h3>
+
+        <form @submit.prevent="saveCreate" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Nazwa</label>
+            <input v-model="form.name" required
+                   class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
           </div>
-          <div class="form-group">
-            <label>ClientId</label>
-            <input v-model="form.clientId" required />
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">ClientId</label>
+            <input v-model="form.clientId" required
+                   class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
           </div>
-          <div class="form-group">
-            <label>ClientSecret</label>
-            <input v-model="form.clientSecret" required />
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">ClientSecret</label>
+            <input v-model="form.clientSecret" required
+                   class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
           </div>
-          <div class="form-group">
-            <label>Redirect URI</label>
-            <input v-model="form.redirectUri" />
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Redirect URI</label>
+            <input v-model="form.redirectUri"
+                   class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
           </div>
-          <div class="form-group">
-            <label>OrganizationId</label>
-            <input v-model="form.organizationId" type="number" />
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">OrganizationId</label>
+            <input v-model.number="form.organizationId" type="number"
+                   class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
           </div>
-          <div class="actions">
-            <button type="button" @click="creating = false">Anuluj</button>
-            <button type="submit">Utw�rz</button>
+
+          <div class="flex justify-end gap-3 mt-2">
+            <button type="button" @click="creating = false"
+                    class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition">Anuluj</button>
+            <button type="submit"
+                    class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">Utwórz</button>
           </div>
         </form>
       </div>

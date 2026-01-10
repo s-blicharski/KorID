@@ -112,8 +112,8 @@ const editUser = (id: number) => {
           <td>{{ user.email }}</td>
           <td>{{ user.role }}</td>
           <td>
-            <button @click="editUser(user.id)">Edytuj</button>
-            <button class="danger" @click="deleteUser(user.id)">Usuń</button>
+            <button @click="editUser(user.id)" class="btn">Edytuj</button>
+            <button class="btn danger" @click="deleteUser(user.id)">Usuń</button>
           </td>
         </tr>
       </tbody>
@@ -147,13 +147,13 @@ const editUser = (id: number) => {
             <button
               type="button"
               @click="editingUser = null"
-              class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition"
+              class="btn px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition"
             >
               Anuluj
             </button>
             <button
               type="submit"
-              class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition"
+              class="btn px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition"
             >
               Zapisz
             </button>

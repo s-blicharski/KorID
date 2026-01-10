@@ -80,7 +80,7 @@
 
         <h1 class="text-2xl font-semibold mb-2">Panel Administratora</h1>
         <div class="space-y-6">
-          <OrganizationList />
+<!--          <OrganizationList />-->
           <UserList />
           <AplicationsList />
         </div>
