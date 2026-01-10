@@ -44,10 +44,16 @@ public class Worker(
     }
     private static async Task SeedDataAsync(KorIdDbContext dbContext, CancellationToken cancellationToken)
     {
+        if (await dbContext.Users.AnyAsync(u => u.Username == "admin", cancellationToken))
+        {
+            return;
+        }
+
         User firstTicket = new()
         {
             Username = "admin",
             Email = "ad@gmail.com",
+            PasswordHash = "change_me_later" // Wymagane pole dla encji User
         };
 
         var strategy = dbContext.Database.CreateExecutionStrategy();

@@ -45,3 +45,162 @@ Accept: {{contentType}}
 # Users - Delete
 DELETE {{KorID.API_HostAddress}}/api/Users/1
 Accept: {{contentType}}
+
+###
+# Organizations
+GET {{KorID.API_HostAddress}}/api/Organizations
+Accept: application/json
+
+###
+# Organizations - Get by id
+GET {{KorID.API_HostAddress}}/api/Organizations/1
+Accept: application/json
+
+###
+# Organizations - Create
+POST {{KorID.API_HostAddress}}/api/Organizations
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Example Organization",
+  "slug": "example-org"
+}
+
+###
+# Organizations - Update
+PUT {{KorID.API_HostAddress}}/api/Organizations/1
+Content-Type: application/json
+Accept: application/json
+
+{
+  "id": 1,
+  "name": "Updated Organization",
+  "slug": "updated-org"
+}
+
+###
+# Organizations - Delete
+DELETE {{KorID.API_HostAddress}}/api/Organizations/1
+Accept: application/json
+
+###
+# Applications
+GET {{KorID.API_HostAddress}}/api/Applications
+Accept: application/json
+
+###
+# Applications - Get by id
+GET {{KorID.API_HostAddress}}/api/Applications/1
+Accept: application/json
+
+###
+# Applications - Create
+POST {{KorID.API_HostAddress}}/api/Applications
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "My App",
+  "clientId": "my-app-client-id",
+  "clientSecret": "super-secret",
+  "redirectUri": "https://app.example.com/callback",
+  "organizationId": 1
+}
+
+###
+# Applications - Update
+PUT {{KorID.API_HostAddress}}/api/Applications/1
+Content-Type: application/json
+Accept: application/json
+
+{
+  "id": 1,
+  "name": "My App (Updated)",
+  "clientId": "my-app-client-id",
+  "clientSecret": "new-secret",
+  "redirectUri": "https://app.example.com/callback",
+  "organizationId": 1
+}
+
+###
+# Applications - Delete
+DELETE {{KorID.API_HostAddress}}/api/Applications/1
+Accept: application/json
+
+###
+# Roles
+GET {{KorID.API_HostAddress}}/api/Roles
+Accept: application/json
+
+###
+# Roles - Get by id
+GET {{KorID.API_HostAddress}}/api/Roles/1
+Accept: application/json
+
+###
+# Roles - Create
+POST {{KorID.API_HostAddress}}/api/Roles
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Admin",
+  "resourceGroup": "users"
+}
+
+###
+# Roles - Update
+PUT {{KorID.API_HostAddress}}/api/Roles/1
+Content-Type: application/json
+Accept: application/json
+
+{
+  "id": 1,
+  "name": "Administrator",
+  "resourceGroup": "users"
+}
+
+###
+# Roles - Delete
+DELETE {{KorID.API_HostAddress}}/api/Roles/1
+Accept: application/json
+
+###
+# UserApplications (many-to-many)
+GET {{KorID.API_HostAddress}}/api/UserApplications
+Accept: application/json
+
+###
+# UserApplications - Get by userId and applicationId
+GET {{KorID.API_HostAddress}}/api/UserApplications/1/2
+Accept: application/json
+
+###
+# UserApplications - Create
+POST {{KorID.API_HostAddress}}/api/UserApplications
+Content-Type: application/json
+Accept: application/json
+
+{
+  "userId": 1,
+  "applicationId": 2,
+  "grantedAt": "2026-01-07T00:00:00Z"
+}
+
+###
+# UserApplications - Update
+PUT {{KorID.API_HostAddress}}/api/UserApplications/1/2
+Content-Type: application/json
+Accept: application/json
+
+{
+  "userId": 1,
+  "applicationId": 2,
+  "grantedAt": "2026-01-08T00:00:00Z"
+}
+
+###
+# UserApplications - Delete
+DELETE {{KorID.API_HostAddress}}/api/UserApplications/1/2
+Accept: application/json

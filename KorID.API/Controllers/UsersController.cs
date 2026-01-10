@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using KorID.API.Models;
 using KorID.Data.Model;
 using KorID.Data.Repositories;
 using Microsoft.AspNetCore.Mvc;
@@ -19,9 +21,16 @@ namespace KorID.API.Controllers
 
         // GET: api/Users
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        public async Task<ActionResult<IEnumerable<UserDto>>> GetUsers()
         {
-            return Ok(await _repo.GetAllAsync());
+            var users = await _repo.GetAllAsync();
+            var userDtos = users.Select(u => new UserDto
+            {
+                Id = u.Id,
+                Username = u.Username,
+                Email = u.Email
+            });
+            return Ok(userDtos);
         }
 
         // GET: api/Users/5
@@ -41,28 +50,27 @@ namespace KorID.API.Controllers
         // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(int id, User user)
+        public async Task<IActionResult> PutUser(int id, UpdateUserRequest request)
         {
-            if (id != user.Id)
+            var user = await _repo.GetByIdAsync(id);
+            if (user == null) return NotFound();
+
+            var existingUserByName = await _repo.GetByUsernameAsync(request.Username);
+            if (existingUserByName != null && existingUserByName.Id != id)
             {
-                return BadRequest();
+                return BadRequest(new { message = "Nazwa użytkownika jest już zajęta." });
             }
 
-            try
+            var existingUserByEmail = await _repo.GetByEmailAsync(request.Email);
+            if (existingUserByEmail != null && existingUserByEmail.Id != id)
             {
-                await _repo.UpdateAsync(user);
+                return BadRequest(new { message = "Email jest już zajęty." });
             }
-            catch (Microsoft.EntityFrameworkCore.DbUpdateConcurrencyException)
-            {
-                if (!await _repo.ExistsAsync(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+
+            user.Username = request.Username;
+            user.Email = request.Email;
+
+            await _repo.UpdateAsync(user);
 
             return NoContent();
         }
@@ -72,8 +80,8 @@ namespace KorID.API.Controllers
         [HttpPost]
         public async Task<ActionResult<User>> PostUser(User user)
         {
-            var created = await _repo.AddAsync(user);
-            return CreatedAtAction(nameof(GetUser), new { id = created.Id }, created);
+            await _repo.AddAsync(user);
+            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
         }
 
         // DELETE: api/Users/5

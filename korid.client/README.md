@@ -46,3 +46,30 @@ npm run build
 ```sh
 npm run lint
 ```
+
+## HTTP client and proxy (local development)
+
+This project includes a small HTTP client setup that uses Vite's dev-server proxy to forward requests starting with `/api` to the backend (see `vite.config.ts`). The frontend code uses `/api` as the base URL so requests are proxied and CORS is avoided during development.
+
+Files added:
+- `src/services/httpClient.ts` ? Axios client configured with baseURL `/api` and request/response interceptors.
+- `src/services/fetchWrapper.ts` ? small fetch-based wrapper with the same `/api` prefix and token handling.
+- `src/components/UseApiExample.vue` ? example component that calls `/users/me` using both clients.
+
+How to manually test the proxy and client:
+
+1. Start the backend (KorID.API) on the address configured in `vite.config.ts` environment variables (or set `services__koridapi__http__0=http://localhost:5000`).
+2. Start the frontend dev server:
+
+```sh
+npm run dev
+```
+
+3. Open the app in the browser (default: http://localhost:5173).
+4. In DevTools -> Application -> Local Storage, set a token under key `korid_token` (e.g. `localStorage.setItem('korid_token','<your_jwt>')`).
+5. Open the page containing `UseApiExample` (it is added to `App.vue`), and check Network tab for requests to `/api/users/me`. Vite will proxy them to the backend.
+6. If the backend returns 401, a `korid:unauthorized` event will be dispatched on window ? you can listen for it to perform logout or redirect.
+
+Notes and next steps:
+- For production builds, configure the real API URL in the built app (e.g. use an env var and set `baseURL` accordingly).
+- Consider using HttpOnly cookies or a refresh-token flow for improved security.

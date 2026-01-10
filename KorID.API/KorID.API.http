@@ -3,4 +3,21 @@
 GET {{KorID.API_HostAddress}}/weatherforecast/
 Accept: application/json
 
-###
+### Rejestracja nowego użytkownika
+POST {{KorID.API_HostAddress}}/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "nowy_uzytkownik",
+  "email": "nowy@example.com",
+  "password": "SuperTajneHaslo123!"
+}
+
+### Logowanie (sprawdzenie czy działa)
+POST {{KorID.API_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "nowy_uzytkownik",
+  "password": "SuperTajneHaslo123!"
+}
