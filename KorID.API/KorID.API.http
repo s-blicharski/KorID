@@ -21,3 +21,52 @@ Content-Type: application/json
   "username": "nowy_uzytkownik",
   "password": "SuperTajneHaslo123!"
 }
+
+### External login - ping (sanity)
+GET {{KorID.API_HostAddress}}/api/external/ping
+Accept: application/json
+
+### List applications (to verify seeded demo app)
+GET {{KorID.API_HostAddress}}/api/applications
+Accept: application/json
+
+### List users (verify seeded demo user)
+GET {{KorID.API_HostAddress}}/api/users
+Accept: application/json
+
+### Check user-application grants
+GET {{KorID.API_HostAddress}}/api/userapplications
+Accept: application/json
+
+### External login (simulate external app calling KorID)
+POST {{KorID.API_HostAddress}}/api/external/login
+Content-Type: application/json
+
+{
+  "email": "demo@example.com",
+  "password": "changeme",
+  "applicationId": 1,
+  "redirectUrl": "http://localhost:5173/test/callback"
+}
+
+### External login - wrong password example
+POST {{KorID.API_HostAddress}}/api/external/login
+Content-Type: application/json
+
+{
+  "email": "demo@example.com",
+  "password": "wrong",
+  "applicationId": 200,
+  "redirectUrl": "http://localhost:5173/test/callback"
+}
+
+### External login - missing grant (use another user or app id)
+POST {{KorID.API_HostAddress}}/api/external/login
+Content-Type: application/json
+
+{
+  "email": "demo@example.com",
+  "password": "changeme",
+  "applicationId": 9999,
+  "redirectUrl": "http://localhost:5173/test/callback"
+}

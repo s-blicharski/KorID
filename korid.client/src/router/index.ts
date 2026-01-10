@@ -13,6 +13,16 @@ const routes: Array<RouteRecordRaw> = [
     path: '/admin',
     name: 'Admin',
     component: () => import('../views/AdminView.vue')
+  },
+  {
+    path: '/test',
+    name: 'TestApp',
+    component: () => import('../views/TestAppView.vue')
+  },
+  {
+    path: '/test/callback',
+    name: 'TestCallback',
+    component: () => import('../views/TestCallbackView.vue')
   }
 ];
 const router = createRouter({
@@ -20,4 +30,4 @@ const router = createRouter({
   routes
 });
 
-export default router; 
+export default router;
