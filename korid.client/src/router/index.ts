@@ -8,11 +8,16 @@ const routes: Array<RouteRecordRaw> = [
     path: '/login',
     name: 'Login',
     component: () => import('../views/LoginView.vue')
-  }, // <-- Pamiętaj o tym przecinku!
+  },
   {
     path: '/admin',
     name: 'Admin',
     component: () => import('../views/AdminView.vue')
+  },
+  {
+    path: '/admin/login',
+    name: 'AdminLoginPage',
+    component: () => import('../views/AdminLoginView.vue')
   },
   {
     path: '/test',

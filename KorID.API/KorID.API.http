@@ -21,25 +21,33 @@ Content-Type: application/json
   "username": "nowy_uzytkownik",
   "password": "SuperTajneHaslo123!"
 }
+### Logowanie (sprawdzenie czy działa admin)
+POST {{KorID.API_HostAddress}}/api/auth/admin/login
+Content-Type: application/json
+
+{
+  "username": "nowy_uzytkownik",
+  "password": "SuperTajneHaslo123!"
+}
 
 ### External login - ping (sanity)
-GET {{KorID.API_HostAddress}}/api/external/ping
+GET http://localhost:5222/api/external/ping
 Accept: application/json
 
 ### List applications (to verify seeded demo app)
-GET {{KorID.API_HostAddress}}/api/applications
+GET http://localhost:5222/api/applications
 Accept: application/json
 
 ### List users (verify seeded demo user)
-GET {{KorID.API_HostAddress}}/api/users
+GET http://localhost:5222/api/users
 Accept: application/json
 
 ### Check user-application grants
-GET {{KorID.API_HostAddress}}/api/userapplications
+GET http://localhost:5222/api/userapplications
 Accept: application/json
 
 ### External login (simulate external app calling KorID)
-POST {{KorID.API_HostAddress}}/api/external/login
+POST http://localhost:5222/api/external/login
 Content-Type: application/json
 
 {
@@ -50,7 +58,7 @@ Content-Type: application/json
 }
 
 ### External login - wrong password example
-POST {{KorID.API_HostAddress}}/api/external/login
+POST http://localhost:5222/api/external/login
 Content-Type: application/json
 
 {
@@ -61,7 +69,7 @@ Content-Type: application/json
 }
 
 ### External login - missing grant (use another user or app id)
-POST {{KorID.API_HostAddress}}/api/external/login
+POST http://localhost:5222/api/external/login
 Content-Type: application/json
 
 {
