@@ -51,8 +51,12 @@ const submitting = ref(false);
 const emailTouched = ref(false);
 const passwordTouched = ref(false);
 
-// Read application id from query params or route params
+// Read application id and optional redirectUrl from query params or route params
 const applicationId = ref(route.query.applicationId || route.query.appId || route.params.applicationId || route.params.appId || '');
+const redirectUrl = ref(route.query.redirectUrl || route.query.redirect || '');
+
+// API base (try Vite env then fallback to localhost backend port)
+const API_BASE = import.meta.env.VITE_API_URL || 'https://localhost:7162';
 
 const emailValid = computed(() => {
   const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\\.,;:\s@\"]+\.)+[^<>()[\]\\.,;:\s@\"]{2,})$/i;
@@ -78,15 +82,15 @@ async function onSubmit() {
 
   try {
     // Call backend endpoint to validate user + permissions for given application
-    // Expected request body: { email, password, applicationId }
-    // Expected response JSON examples:
-    //  - success: { success: true, username: 'Jan Kowalski', redirectUrl: 'https://app.example.com/callback' }
-    //  - failure: { success: false, message: 'Brak uprawnień' }
+    // Expected request body: { email, password, applicationId, redirectUrl? }
 
-    const res = await fetch('/api/external/login', {
+    const payload = { email: email.value, password: password.value, applicationId: applicationId.value };
+    if (redirectUrl.value) payload['redirectUrl'] = redirectUrl.value;
+
+    const res = await fetch(`${API_BASE}/api/external/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email.value, password: password.value, applicationId: applicationId.value })
+      body: JSON.stringify(payload)
     });
 
     if (!res.ok) {
@@ -100,13 +104,13 @@ async function onSubmit() {
     const data = await res.json();
     if (data?.success) {
       // if backend provides redirectUrl, redirect back to calling application with username and status
-      if (data.redirectUrl) {
+      const target = data.redirectUrl || redirectUrl.value;
+      if (target) {
         const params = new URLSearchParams();
         if (data.username) params.set('username', data.username);
         params.set('status', 'ok');
-        // append params to provided redirectUrl
-        const sep = data.redirectUrl.includes('?') ? '&' : '?';
-        window.location.href = data.redirectUrl + sep + params.toString();
+        const sep = target.includes('?') ? '&' : '?';
+        window.location.href = target + sep + params.toString();
         return;
       }
 
