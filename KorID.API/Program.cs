@@ -9,6 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 
+
+
 // Add services to the container.
 builder.Services.AddDataServices(builder.Configuration, "koriddb");
 
@@ -59,6 +61,13 @@ builder.Services.AddCors(options =>
 
 // Rejestracja serwisu hashowania haseł
 builder.Services.AddSingleton<IPasswordHasher, BCryptPasswordHasher>();
+
+// Włącza symulację rozproszonego cache (Redis) w pamięci RAM
+builder.Services.AddDistributedMemoryCache(); 
+
+// Poniżej powinieneś już mieć swój QrCodeService z wcześniejszych kroków
+builder.Services.AddScoped<QrCodeService>();
+
 
 var app = builder.Build();
 
