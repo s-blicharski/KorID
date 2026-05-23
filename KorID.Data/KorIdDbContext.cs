@@ -72,6 +72,18 @@ public class KorIdDbContext : DbContext
                 .WithMany(o => o.Users)
                 .HasForeignKey(u => u.OrganizationId)
                 .OnDelete(DeleteBehavior.SetNull);
+            
+            b.HasMany(u => u.Roles)
+                .WithMany(r => r.Users)
+                .UsingEntity<Dictionary<string, object>>(
+                    "UserRoles",
+                    j => j.HasOne<Role>().WithMany().HasForeignKey("RoleId").OnDelete(DeleteBehavior.Cascade),
+                    j => j.HasOne<Model.User>().WithMany().HasForeignKey("UserId").OnDelete(DeleteBehavior.Cascade),
+                    j =>
+                    {
+                        j.HasKey("UserId", "RoleId");
+                        j.ToTable("UserRoles");
+                    });
 
             b.ToTable("Users");
         });

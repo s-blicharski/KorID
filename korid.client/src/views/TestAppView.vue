@@ -17,11 +17,11 @@
     </div>
 
     <div style="margin-top: 1rem;">
-      <button @click="startLoginPopup" :disabled="!appId">Start login at KorID (popup)</button>
+      <!--<button @click="startLoginPopup" :disabled="!appId">Start login at KorID (popup)</button>-->
       <button @click="startLogin" :disabled="!appId" style="margin-left: .5rem">Start login at KorID (same window)</button>
     </div>
 
-    <div style="margin-top: 2rem; background:#f7f7f7; padding:1rem; border-radius:6px;">
+    <div style="margin-top: 2rem; background:#666; padding:1rem; border-radius:6px; color:#eee;">
       <strong>Note:</strong> This will redirect to the SPA route `/login` with query parameters `applicationId` and `redirectUrl`.
       The popup flow will postMessage back to this window when the callback is reached and then close the popup.
     </div>

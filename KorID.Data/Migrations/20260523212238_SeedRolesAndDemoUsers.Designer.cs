@@ -3,6 +3,7 @@ using System;
 using KorID.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace KorID.Data.Migrations
 {
     [DbContext(typeof(KorIdDbContext))]
-    partial class KorIdDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260523212238_SeedRolesAndDemoUsers")]
+    partial class SeedRolesAndDemoUsers
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

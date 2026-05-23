@@ -24,13 +24,14 @@ public class AuthService : IAuthService
     public async Task<LoginResponse?> AuthenticateAsync(string username, string password)
     {
         var user = await _userRepository.GetByUsernameAsync(username);
-        
+
         if (user == null || !VerifyPassword(password, user.PasswordHash))
         {
             return null;
         }
 
-        var token = GenerateJwtToken(user.Id, user.Username, user.Email);
+        var roles = user.Roles.Select(r => r.Name).ToArray();
+        var token = GenerateToken(user.Username, roles, user.Id, user.Email);
         var expiresAt = DateTime.UtcNow.AddMinutes(
             _configuration.GetValue<int>("Jwt:ExpirationMinutes", 60));
 
@@ -38,7 +39,8 @@ public class AuthService : IAuthService
         {
             Token = token,
             ExpiresAt = expiresAt,
-            Username = user.Username
+            Username = user.Username,
+            Roles = roles
         };
     }
 
@@ -60,15 +62,11 @@ public class AuthService : IAuthService
         return true;
     }
 
-    public string HashPassword(string password)
-    {
-        return _passwordHasher.Hash(password);
-    }
+    public string HashPassword(string password) => _passwordHasher.Hash(password);
 
     public bool VerifyPassword(string password, string passwordHash)
     {
-        // Support a demo plaintext marker used by migration seeding to simplify local testing.
-        // If a stored hash starts with "$DEMO$HASH$", the remainder is treated as plaintext password.
+        // Furtka demo: hash zaczynający się od "$DEMO$HASH$" traktujemy jako plaintext.
         if (!string.IsNullOrEmpty(passwordHash) && passwordHash.StartsWith("$DEMO$HASH$"))
         {
             var demoPlain = passwordHash.Substring("$DEMO$HASH$".Length);
@@ -78,10 +76,10 @@ public class AuthService : IAuthService
         return _passwordHasher.Verify(password, passwordHash);
     }
 
-    private string GenerateJwtToken(int userId, string username, string email)
+    public string GenerateToken(string username, IEnumerable<string> roles, int userId = 0, string? email = null)
     {
         var jwtSettings = _configuration.GetSection("Jwt");
-        var secretKey = jwtSettings["SecretKey"] 
+        var secretKey = jwtSettings["SecretKey"]
             ?? throw new InvalidOperationException("JWT SecretKey not configured");
         var issuer = jwtSettings["Issuer"] ?? "KorID";
         var audience = jwtSettings["Audience"] ?? "KorID";
@@ -90,19 +88,28 @@ public class AuthService : IAuthService
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-        var claims = new[]
+        var claims = new List<Claim>
         {
             new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
             new Claim(JwtRegisteredClaimNames.UniqueName, username),
-            new Claim(JwtRegisteredClaimNames.Email, email),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString())
+            new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(),
+                ClaimValueTypes.Integer64)
         };
+
+        if (!string.IsNullOrEmpty(email))
+            claims.Add(new Claim(JwtRegisteredClaimNames.Email, email));
+
+        // Claim roli pod krótką nazwą "role". Walidacja ustawia RoleClaimType = "role"
+        // i MapInboundClaims = false, więc nie ma mapowania na długie URI.
+        foreach (var role in roles.Where(r => !string.IsNullOrWhiteSpace(r)).Distinct())
+            claims.Add(new Claim("role", role));
 
         var token = new JwtSecurityToken(
             issuer: issuer,
             audience: audience,
             claims: claims,
+            notBefore: DateTime.UtcNow,
             expires: DateTime.UtcNow.AddMinutes(expirationMinutes),
             signingCredentials: credentials
         );

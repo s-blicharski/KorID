@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, reactive } from 'vue'
+import { fetchWrapper } from '../../services/fetchWrapper';
 
 interface User {
   id: number;
@@ -19,12 +20,7 @@ const editForm = reactive({
 
 onMounted(async () => {
   try {
-    // Pobieramy dane z endpointu API
-    const response = await fetch('http://localhost:5222/api/users')
-    if (response.ok) {
-      const data = await response.json()
-      users.value = data
-    }
+    users.value = await fetchWrapper.get<User[]>('/api/users');
   } catch (error) {
     console.error('Błąd pobierania użytkowników:', error)
   } finally {
@@ -34,17 +30,9 @@ onMounted(async () => {
 
 const deleteUser = async (id: number) => {
   if (!confirm('Czy na pewno chcesz usunąć tego użytkownika?')) return
-
   try {
-    const response = await fetch(`http://localhost:5222/api/users/${id}`, {
-      method: 'DELETE'
-    })
-
-    if (response.ok) {
-      users.value = users.value.filter(u => u.id !== id)
-    } else {
-      alert('Wystąpił błąd podczas usuwania.')
-    }
+    await fetchWrapper.del(`/api/users/${id}`);
+    users.value = users.value.filter(u => u.id !== id);   // <-- dodaj z powrotem
   } catch (error) {
     console.error('Błąd usuwania:', error)
   }
@@ -52,28 +40,18 @@ const deleteUser = async (id: number) => {
 
 const saveUser = async () => {
   if (!editingUser.value) return
-
   try {
-    const response = await fetch(`http://localhost:5222/api/users/${editingUser.value.id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(editForm)
-    })
+    await fetchWrapper.put(`/api/users/${editingUser.value.id}`, editForm);
+    const idx = users.value.findIndex(u => u.id === editingUser.value?.id);
+    if (idx !== -1) {
+      const userToUpdate = users.value[idx];
 
-    if (response.ok) {
-      // Aktualizujemy dane na liście lokalnej
-      const index = users.value.findIndex(u => u.id === editingUser.value?.id)
-      if (index !== -1) {
-        users.value[index].username = editForm.username
-        users.value[index].email = editForm.email
+      if (userToUpdate) {
+        userToUpdate.username = editForm.username;
+        userToUpdate.email = editForm.email;
       }
-      editingUser.value = null // Zamykamy modal
-    } else {
-      const errorData = await response.json().catch(() => null)
-      alert(errorData?.message || 'Wystąpił błąd podczas zapisu.')
     }
+    editingUser.value = null;   // zamknij modal
   } catch (error) {
     console.error('Błąd edycji:', error)
   }

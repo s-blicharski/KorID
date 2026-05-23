@@ -8,4 +8,6 @@ public interface IAuthService
     Task<bool> RegisterAsync(RegisterRequest request);
     string HashPassword(string password);
     bool VerifyPassword(string password, string passwordHash);
+    string GenerateToken(string username, IEnumerable<string> roles, int userId = 0, string? email = null);
+
 }

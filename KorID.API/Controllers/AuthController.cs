@@ -1,6 +1,7 @@
 using KorID.API.Models;
 using KorID.API.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace KorID.API.Controllers;
 
@@ -21,6 +22,7 @@ public class AuthController : ControllerBase
     /// <param name="request">Login credentials</param>
     /// <returns>JWT token if authentication successful</returns>
     [HttpPost("login")]
+    [AllowAnonymous]
     public async Task<ActionResult<LoginResponse>> Login([FromBody] LoginRequest request)
     {
         if (!ModelState.IsValid)
@@ -38,6 +40,7 @@ public class AuthController : ControllerBase
         return Ok(response);
     }
     [HttpPost("admin/login")]
+    [AllowAnonymous]
     public async Task<ActionResult<LoginResponse>> AdminLogin([FromBody] LoginRequest request)
     {
         if (!ModelState.IsValid)
@@ -51,6 +54,10 @@ public class AuthController : ControllerBase
         {
             return Unauthorized(new { message = "Invalid username or password" });
         }
+        
+        if (!response.Roles.Contains("admin"))
+            return StatusCode(StatusCodes.Status403Forbidden,
+                new { message = "Konto nie ma uprawnień administratora." });
 
         return Ok(response);
     }
@@ -61,6 +68,7 @@ public class AuthController : ControllerBase
     /// <param name="request">Registration details</param>
     /// <returns>Success message if registered</returns>
     [HttpPost("register")]
+    [AllowAnonymous]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
         if (!ModelState.IsValid)

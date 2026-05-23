@@ -15,4 +15,5 @@ public class User
 
     // Navigation for applications access
     public ICollection<UserApplication> UserApplications { get; set; } = new List<UserApplication>();
+    public ICollection<Role> Roles { get; set; } = new List<Role>();
 }

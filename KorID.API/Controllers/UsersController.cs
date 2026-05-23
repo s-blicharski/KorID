@@ -4,12 +4,14 @@ using System.Threading.Tasks;
 using KorID.API.Models;
 using KorID.Data.Model;
 using KorID.Data.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace KorID.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class UsersController : ControllerBase
     {
         private readonly IUserRepository _repo;
@@ -50,6 +52,7 @@ namespace KorID.API.Controllers
         // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> PutUser(int id, UpdateUserRequest request)
         {
             var user = await _repo.GetByIdAsync(id);
@@ -78,6 +81,7 @@ namespace KorID.API.Controllers
         // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Roles = "admin")]
         public async Task<ActionResult<User>> PostUser(User user)
         {
             await _repo.AddAsync(user);
@@ -86,6 +90,7 @@ namespace KorID.API.Controllers
 
         // DELETE: api/Users/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> DeleteUser(int id)
         {
             var user = await _repo.GetByIdAsync(id);

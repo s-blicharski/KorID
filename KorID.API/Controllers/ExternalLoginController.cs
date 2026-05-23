@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using KorID.API.Models;
 using KorID.API.Services;
 using KorID.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,6 +10,7 @@ namespace KorID.API.Controllers;
 
 [Route("api/external")]
 [ApiController]
+[AllowAnonymous]
 public class ExternalLoginController : ControllerBase
 {
     private readonly KorIdDbContext _db;
@@ -44,7 +46,7 @@ public class ExternalLoginController : ControllerBase
     [HttpPost("login")]
     public async Task<ActionResult<ExternalLoginResult>> Login([FromBody] ExternalLoginRequest req)
     {
-        if (req == null) return BadRequest(new ExternalLoginResult { Success = false, Message = "Brak danych ¿¹dania." });
+        if (req == null) return BadRequest(new ExternalLoginResult { Success = false, Message = "Brak danych ï¿½ï¿½dania." });
 
         var app = await _db.Applications
             .Include(a => a.Organization)
@@ -57,7 +59,7 @@ public class ExternalLoginController : ControllerBase
 
         if (app.OrganizationId == null)
         {
-            return BadRequest(new ExternalLoginResult { Success = false, Message = "Aplikacja nie jest powi¹zana z organizacj¹." });
+            return BadRequest(new ExternalLoginResult { Success = false, Message = "Aplikacja nie jest powiï¿½zana z organizacjï¿½." });
         }
 
         var user = await _db.Users
@@ -66,13 +68,13 @@ public class ExternalLoginController : ControllerBase
 
         if (user == null)
         {
-            return Unauthorized(new ExternalLoginResult { Success = false, Message = "U¿ytkownik nie istnieje w organizacji powi¹zanej z aplikacj¹." });
+            return Unauthorized(new ExternalLoginResult { Success = false, Message = "Uï¿½ytkownik nie istnieje w organizacji powiï¿½zanej z aplikacjï¿½." });
         }
 
         // verify password using auth service (supports demo hash marker)
         if (!_authService.VerifyPassword(req.Password, user.PasswordHash))
         {
-            return Unauthorized(new ExternalLoginResult { Success = false, Message = "Nieprawid³owe dane logowania." });
+            return Unauthorized(new ExternalLoginResult { Success = false, Message = "Nieprawidï¿½owe dane logowania." });
         }
 
         // check grant

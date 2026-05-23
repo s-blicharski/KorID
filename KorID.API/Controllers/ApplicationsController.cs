@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using KorID.Data;
 using KorID.Data.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,6 +10,7 @@ namespace KorID.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "admin")]
     public class ApplicationsController : ControllerBase
     {
         private readonly KorIdDbContext _context;
@@ -19,6 +21,7 @@ namespace KorID.API.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<Application>>> GetApplications()
         {
             return Ok(await _context.Applications
@@ -27,6 +30,7 @@ namespace KorID.API.Controllers
         }
 
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<ActionResult<Application>> GetApplication(int id)
         {
             var app = await _context.Applications
@@ -38,6 +42,7 @@ namespace KorID.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "admin")] 
         public async Task<ActionResult<Application>> PostApplication(Application application)
         {
             _context.Applications.Add(application);
@@ -46,6 +51,7 @@ namespace KorID.API.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "admin")] 
         public async Task<IActionResult> PutApplication(int id, Application application)
         {
             if (id != application.Id) return BadRequest();
@@ -66,6 +72,7 @@ namespace KorID.API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "admin")] 
         public async Task<IActionResult> DeleteApplication(int id)
         {
             var app = await _context.Applications.FindAsync(id);
