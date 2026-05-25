@@ -1,7 +1,6 @@
 <script setup lang="ts">
   import { ref, onMounted, onBeforeUnmount } from 'vue';
   import { useRouter } from 'vue-router';
-  import OrganizationList from "../components/admin/OrganizationList.vue";
   import UserList from "../components/admin/UserList.vue";
   import AplicationsList from "../components/admin/AplicationsList.vue";
   const router = useRouter();
@@ -48,6 +47,18 @@
     router.push('/admin/login');
   }
 
+  function goToGate(gateName: string) {
+    if (gateName === 'gate1') {
+      router.push('/access/gate1');
+    } else if (gateName === 'gate2') {
+      router.push('/access/gate2');
+    }
+  }
+
+  function goToDashboard() {
+    router.push('/dashboard');
+  }
+
   function handleUnauthorized() {
     logout();
   }
@@ -79,8 +90,33 @@
         </div>
 
         <h1 class="text-2xl font-semibold mb-2">Panel Administratora</h1>
+
+        <!-- Sekcja: Nawigacja do stref dostępu -->
+        <div style="background:#f9f9f9; padding:1rem; border-radius:8px; margin-bottom:2rem;">
+          <h3 style="margin-top:0;">🚪 Strefy dostępu:</h3>
+          <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+            <button
+              @click="goToGate('gate1')"
+              style="padding:0.75rem 1.5rem; background:#ff9800; color:white; border:none; border-radius:4px; cursor:pointer; font-weight:bold;"
+            >
+              🔒 Strefa #1 (Admin)
+            </button>
+            <button
+              @click="goToGate('gate2')"
+              style="padding:0.75rem 1.5rem; background:#0066cc; color:white; border:none; border-radius:4px; cursor:pointer; font-weight:bold;"
+            >
+              🔍 Strefa #2 (Viewer)
+            </button>
+            <button
+              @click="goToDashboard"
+              style="padding:0.75rem 1.5rem; background:#28a745; color:white; border:none; border-radius:4px; cursor:pointer; font-weight:bold;"
+            >
+              📱 Mój Dashboard
+            </button>
+          </div>
+        </div>
+
         <div class="space-y-6">
-<!--          <OrganizationList />-->
           <UserList />
           <AplicationsList />
         </div>

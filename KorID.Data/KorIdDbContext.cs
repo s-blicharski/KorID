@@ -1,5 +1,6 @@
-﻿﻿using KorID.Data.Entities;
+﻿using KorID.Data.Entities;
 using KorID.Data.Model;
+using KorID.Data.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace KorID.Data;
@@ -15,6 +16,8 @@ public class KorIdDbContext : DbContext
     public DbSet<Application> Applications { get; set; } = null!;
     public DbSet<Role> Roles { get; set; } = null!;
     public DbSet<UserApplication> UserApplications { get; set; } = null!;
+    
+    public DbSet<AuditLog> AuditLogs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -106,5 +109,6 @@ public class KorIdDbContext : DbContext
             b.Property(ua => ua.GrantedAt).IsRequired();
             b.ToTable("UserApplications");
         });
+        
     }
 }

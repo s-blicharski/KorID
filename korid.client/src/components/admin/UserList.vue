@@ -20,7 +20,7 @@ const editForm = reactive({
 
 onMounted(async () => {
   try {
-    users.value = await fetchWrapper.get<User[]>('/api/users');
+    users.value = await fetchWrapper.get<User[]>('/users');
   } catch (error) {
     console.error('Błąd pobierania użytkowników:', error)
   } finally {
@@ -31,8 +31,8 @@ onMounted(async () => {
 const deleteUser = async (id: number) => {
   if (!confirm('Czy na pewno chcesz usunąć tego użytkownika?')) return
   try {
-    await fetchWrapper.del(`/api/users/${id}`);
-    users.value = users.value.filter(u => u.id !== id);   // <-- dodaj z powrotem
+    await fetchWrapper.del(`/users/${id}`);
+    users.value = users.value.filter(u => u.id !== id);
   } catch (error) {
     console.error('Błąd usuwania:', error)
   }
@@ -41,7 +41,7 @@ const deleteUser = async (id: number) => {
 const saveUser = async () => {
   if (!editingUser.value) return
   try {
-    await fetchWrapper.put(`/api/users/${editingUser.value.id}`, editForm);
+    await fetchWrapper.put(`/users/${editingUser.value.id}`, editForm);
     const idx = users.value.findIndex(u => u.id === editingUser.value?.id);
     if (idx !== -1) {
       const userToUpdate = users.value[idx];

@@ -34,7 +34,9 @@ public class ExternalLoginController : ControllerBase
     {
         public bool Success { get; set; }
         public string? Username { get; set; }
+        public string? Token { get; set; }
         public string? RedirectUrl { get; set; }
+        public string? RedirectRoute { get; set; }
         public string? Message { get; set; }
     }
 
@@ -85,12 +87,21 @@ public class ExternalLoginController : ControllerBase
         }
 
         // success - choose redirect
+        var roles = user.Roles.Select(r => r.Name).ToArray();
+        if (roles.Length == 0)
+        {
+            roles = new[] { "viewer" };
+        }
+
+        var token = _authService.GenerateToken(user.Username, roles, user.Id, user.Email);
         var redirect = req.RedirectUrl ?? app.RedirectUri;
 
         return Ok(new ExternalLoginResult
         {
             Success = true,
             Username = user.Username,
+            Token = token,
+            RedirectRoute = "/dashboard",
             RedirectUrl = redirect
         });
     }

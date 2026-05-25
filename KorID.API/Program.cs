@@ -77,7 +77,7 @@ builder.Services.AddDistributedMemoryCache();
 
 // Poniżej powinieneś już mieć swój QrCodeService z wcześniejszych kroków
 builder.Services.AddScoped<QrCodeService>();
-
+builder.Services.AddMemoryCache();
 
 var app = builder.Build();
 

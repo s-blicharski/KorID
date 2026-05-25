@@ -1,20 +1,24 @@
 import { defineConfig } from 'vite';
 import plugin from '@vitejs/plugin-vue';
 import tailwindcss from '@tailwindcss/vite'
+import { fileURLToPath, URL } from 'node:url';
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [plugin(),
     tailwindcss(),],
+  resolve: {
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url))
+    }
+  },
   server: {
     host: true,
     port: parseInt(process.env.PORT ?? "5173"),
     proxy: {
       '/api': {
-        target:
-          process.env.services__koridapi__https__0 ||
-          process.env.services__koridapi__http__0,
+        target: 'http://localhost:5222',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
+        // Nie usuwaj /api, bo backend go oczekuje!
         secure: false
       }
     }

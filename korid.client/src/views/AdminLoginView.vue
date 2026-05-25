@@ -24,15 +24,15 @@ async function handleLogin() {
 
   loading.value = true;
 
-  try {
-    const response = await fetchWrapper.post<LoginResponse>(
-      '/api/auth/admin/login',
-      {
-        username: username.value,
-        password: password.value
-      },
-      { auth: false }
-    );
+   try {
+     const response = await fetchWrapper.post<LoginResponse>(
+       '/auth/admin/login',
+       {
+         username: username.value,
+         password: password.value
+       },
+       { auth: false }
+     );
 
     if (response && response.token) {
       localStorage.setItem('korid_token', response.token);

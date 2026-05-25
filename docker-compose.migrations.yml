@@ -18,3 +18,4 @@ services:
 #   lub docker compose -f docker-compose.migrations.yml ps 
 # $env:ConnectionStrings__koriddb = "Host=localhost;Port=5432;Database=koriddb;Username=postgres;Password=postgres"
 # dotnet ef migrations add InitialCreate --project .\KorID.Data\KorID.Data.csproj
+# dotnet ef migrations add InitialCreate --project ./KorID.Data/KorID.Data.csproj

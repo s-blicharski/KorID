@@ -55,11 +55,8 @@
   const applicationId = ref(route.query.applicationId || route.query.appId || route.params.applicationId || route.params.appId || '');
   const redirectUrl = ref(route.query.redirectUrl || route.query.redirect || '');
 
-  // API base (try Vite env then fallback to localhost backend port)
-  const API_BASE = import.meta.env.VITE_API_URL || 'https://localhost:7162';
-
   const emailValid = computed(() => {
-    const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\\.,;:\s@\"]+\.)+[^<>()[\]\\.,;:\s@\"]{2,})$/i;
+    const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@(([^<>()[\]\\.,;:\s@"]+\.)+[^<>()[\]\\.,;:\s@"]{2,})$/i;
     return re.test(email.value);
   });
 
@@ -87,7 +84,7 @@
       const payload = { email: email.value, password: password.value, applicationId: applicationId.value };
       if (redirectUrl.value) payload['redirectUrl'] = redirectUrl.value;
 
-      const res = await fetch(`${API_BASE}/api/external/login`, {
+      const res = await fetch(`/api/external/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -95,7 +92,7 @@
 
       if (!res.ok) {
         // Read body (could be ProblemDetails, custom message or plain text)
-        let parsedBody = null;
+        let parsedBody;
         try { parsedBody = await res.json(); } catch { parsedBody = await res.text().catch(() => null); }
 
         // Provide a clear message for 403 (forbidden -> user lacks grant for this application)
@@ -139,25 +136,12 @@
 
       const data = await res.json();
       if (data?.success) {
-        // if backend provides redirectUrl, redirect back to calling application with username and status
-        const target = data.redirectUrl || redirectUrl.value;
-        if (target) {
-          const params = new URLSearchParams();
-          if (data.username) params.set('username', data.username);
-          params.set('status', 'ok');
-          const sep = target.includes('?') ? '&' : '?';
-          window.location.href = target + sep + params.toString();
-          return;
+        if (data.token) {
+          localStorage.setItem('korid_token', data.token);
         }
 
-        // Fallback: navigate to provided route inside SPA if backend returned route
-        if (data.redirectRoute) {
-          router.push(data.redirectRoute);
-          return;
-        }
-
-        // If no redirect provided, show success message
-        error.value = 'Zalogowano, ale brak adresu przekierowania.';
+        const targetRoute = data.redirectRoute || '/dashboard';
+        await router.push(targetRoute);
       } else {
         error.value = data?.message || 'Nieprawidłowe dane logowania lub brak uprawnień.';
       }
@@ -181,7 +165,7 @@
   }
 
   .login-card {
-    background: white;
+    background: gray;
     padding: 32px;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
